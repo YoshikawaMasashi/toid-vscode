@@ -10,6 +10,42 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "toid-vscode" is now active!');
 
+	context.subscriptions.push(
+		vscode.window.onDidChangeActiveTextEditor(editor => {
+			if (editor) {
+				console.log('DEBUG');
+			}
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.workspace.onDidChangeTextDocument(e => {
+			console.log('DEBUG2');
+		})
+	);
+
+
+	context.subscriptions.push(
+		vscode.window.onDidChangeTextEditorSelection(e => { // ここでカーソルの位置の変化もわかる
+			console.log('DEBUG3', e.selections[0].active);
+		})
+	);
+
+
+	const myScheme = 'question';
+	const myProvider = new class implements vscode.TextDocumentContentProvider {
+
+		// emitter and its event
+		onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
+		onDidChange = this.onDidChangeEmitter.event;
+
+		provideTextDocumentContent(uri: vscode.Uri): string {
+			// simply invoke cowsay, use uri-path as text
+			return "import numpy as np";
+		}
+	};
+	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, myProvider));
+
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
@@ -18,6 +54,16 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from toid!');
+
+		// Open temporal python window
+		vscode.workspace.openTextDocument({language:"python", content:""}).then(doc => {
+			vscode.window.showTextDocument(doc);
+		});
+
+		let uri = vscode.Uri.parse('question:question');
+		vscode.workspace.openTextDocument(uri).then(doc => {
+			vscode.window.showTextDocument(doc, { preview: false, viewColumn: vscode.ViewColumn.Two });
+		});
 	});
 
 	context.subscriptions.push(disposable);
