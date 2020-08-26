@@ -1,10 +1,12 @@
 // This script will be run within the webview itself
+
 // It cannot access the main VS Code APIs directly.
 (function () {
     const vscode = acquireVsCodeApi();
     vscode.setState({
         questions: [],
         answers: [],
+        startTimes: [],
     });
 
     // const oldState = vscode.getState();
@@ -39,13 +41,14 @@
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
             case 'addQuestion':
-                var oldQuestions = vscode.getState()['questions'];
-                var oldAnswers = vscode.getState()['answers'];
+                var questions = vscode.getState()['questions'];
+                var answers = vscode.getState()['answers'];
+                var startTimes = vscode.getState()['startTimes'];
 
                 var mainDiv = document.getElementById("main");
 
                 var questionDiv = document.createElement("div");
-                var line = oldQuestions.length;
+                var line = questions.length;
                 questionDiv.setAttribute("id", "question" + line);
                 var questionContent = document.createTextNode(message.question); 
                 questionDiv.appendChild(questionContent);
@@ -64,22 +67,35 @@
 
                 mainDiv.appendChild(questionDiv);
 
-                oldQuestions.push(message.question);
-                oldAnswers.push('');
-                vscode.setState({ questions: oldQuestions, answers: oldAnswers });
+                questions.push(message.question);
+                answers.push('');
+                startTimes.push(null);
+                vscode.setState({ questions: questions, answers: answers, startTimes: startTimes });
                 break;
             case 'setAnswer':
-                var oldQuestions = vscode.getState()['questions'];
-                var oldAnswers = vscode.getState()['answers'];
+                var questions = vscode.getState()['questions'];
+                var answers = vscode.getState()['answers'];
+                var startTimes = vscode.getState()['startTimes'];
 
-                oldAnswers[message.line] = message.answer;
+                answers[message.line] = message.answer;
 
-                if (oldQuestions[message.line] !== "" && oldQuestions[message.line] === oldAnswers[message.line]) {
-                    var resultSpan = document.getElementById("result" + message.line);
-                    resultSpan.textContent = " Done";
+                if (questions[message.line] !== "") {
+                    if (questions[message.line] === answers[message.line]) {
+                        var resultSpan = document.getElementById("result" + message.line);
+                        resultSpan.textContent = " Done";
+                    }
+
+                    if (answers[message.line].length === 1) {
+                        startTimes[message.line] = Date.now();
+                    }
+
+                    if(startTimes[message.line] !== null) {
+                        var timeSpan = document.getElementById("time" + message.line);
+                        timeSpan.textContent = " " + (Date.now() - startTimes[message.line]);
+                    }
                 }
 
-                vscode.setState({ questions: oldQuestions, answers: oldAnswers});
+                vscode.setState({ questions: questions, answers: answers, startTimes: startTimes});
 
         }
     });
