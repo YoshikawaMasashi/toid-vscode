@@ -10,16 +10,25 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:toid-vscode.helloWorld"
+        "onCommand:toid-vscode.practice"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "toid-vscode.helloWorld",
-				"title": "Hello World"
+				"command": "toid-vscode.practice",
+				"title": "practice"
 			}
-		]
+		],
+		"menus": {
+		  "explorer/context": [
+			{
+			  "when": "resourceLangId == python",
+			  "command": "toid-vscode.practice",
+			  "group": "navigation"
+			}
+		  ]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",

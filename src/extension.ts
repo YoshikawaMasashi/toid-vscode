@@ -1,11 +1,10 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-
+import * as fs from 'fs';
 
 // TODO 一回しか開けないようにする
 // TODO 他のウィンドウを開いたりしたら即練習終了
-var counter = 0;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -51,7 +50,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('toid-vscode.helloWorld', () => {
+	let disposable = vscode.commands.registerCommand('toid-vscode.practice', (args) => {
+		
+		let buffer = fs.readFileSync(args.path);
+		var questions = buffer.toString().split('\n');
 		// The code you place here will be executed every time your command is executed
 
 		// Display a message box to the user
@@ -62,12 +64,6 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showTextDocument(doc, {viewColumn: vscode.ViewColumn.One});
 		});
 
-		var questions = [
-			"import numpy as np",
-			"import toid",
-			"",
-			"p['a']"
-		];
 		QuestionPanel.createOrShow(context.extensionUri, questions);
 	});
 
