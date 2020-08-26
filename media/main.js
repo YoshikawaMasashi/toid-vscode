@@ -85,12 +85,16 @@
                         resultSpan.textContent = " Done";
                     }
 
-                    if (answers[message.line].length === 1) {
+                    if (answers[message.line].length === 0) {
+                        startTimes[message.line] = null;
+                    } else if (answers[message.line].length === 1) {
                         startTimes[message.line] = Date.now();
                     }
 
-                    if(startTimes[message.line] !== null) {
-                        var timeSpan = document.getElementById("time" + message.line);
+                    var timeSpan = document.getElementById("time" + message.line);
+                    if(startTimes[message.line] === null) {
+                        timeSpan.textContent = "";
+                    } else {
                         timeSpan.textContent = " " + (Date.now() - startTimes[message.line]);
                     }
                 }

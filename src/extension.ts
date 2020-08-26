@@ -25,6 +25,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.workspace.onDidChangeTextDocument(e => {
+			// var line = e.contentChanges[0].range.start.line;
+			// QuestionPanel.currentPanel?.setAnswer(
+			// 	line,
+			// 	e.document.lineAt(line).text
+			// );
 			// console.log('DEBUG2');
 			// console.log(e);
 		})
