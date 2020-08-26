@@ -3,7 +3,8 @@
 (function () {
     const vscode = acquireVsCodeApi();
     vscode.setState({
-        lines: []
+        questions: [],
+        answers: [],
     });
 
     // const oldState = vscode.getState();
@@ -37,33 +38,49 @@
     window.addEventListener('message', event => {
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
-            case 'addline':
-                var oldLines = vscode.getState()['lines'];
+            case 'addQuestion':
+                var oldQuestions = vscode.getState()['questions'];
+                var oldAnswers = vscode.getState()['answers'];
 
                 var mainDiv = document.getElementById("main");
 
-                var lineDiv = document.createElement("div");
-                lineDiv.setAttribute("id", "line" + oldLines.length);
-                var lineContent = document.createTextNode(message.line); 
-                lineDiv.appendChild(lineContent);
-                if (message.line === "") {
+                var questionDiv = document.createElement("div");
+                var line = oldQuestions.length;
+                questionDiv.setAttribute("id", "question" + line);
+                var questionContent = document.createTextNode(message.question); 
+                questionDiv.appendChild(questionContent);
+                if (message.question === "") {
                     var br = document.createElement("br");
-                    lineDiv.appendChild(br);
+                    questionDiv.appendChild(br);
                 }
 
                 var resultSpan = document.createElement("span");
-                resultSpan.setAttribute("id", "result");
-                lineDiv.appendChild(resultSpan);
+                resultSpan.setAttribute("id", "result" + line);
+                questionDiv.appendChild(resultSpan);
 
                 var timeSpan = document.createElement("span");
-                timeSpan.setAttribute("id", "time");
-                lineDiv.appendChild(timeSpan);
+                timeSpan.setAttribute("id", "time" + line);
+                questionDiv.appendChild(timeSpan);
 
-                mainDiv.appendChild(lineDiv);
+                mainDiv.appendChild(questionDiv);
 
-                var newLines = oldLines.push(message.line);
-                vscode.setState({ lines: newLines });
+                oldQuestions.push(message.question);
+                oldAnswers.push('');
+                vscode.setState({ questions: oldQuestions, answers: oldAnswers });
                 break;
+            case 'setAnswer':
+                var oldQuestions = vscode.getState()['questions'];
+                var oldAnswers = vscode.getState()['answers'];
+
+                oldAnswers[message.line] = message.answer;
+
+                if (oldQuestions[message.line] !== "" && oldQuestions[message.line] === oldAnswers[message.line]) {
+                    var resultSpan = document.getElementById("result" + message.line);
+                    resultSpan.textContent = " Done";
+                }
+
+                vscode.setState({ questions: oldQuestions, answers: oldAnswers});
+
         }
     });
 }());

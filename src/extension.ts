@@ -18,21 +18,27 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.window.onDidChangeActiveTextEditor(editor => {
 			if (editor) {
-				console.log('DEBUG');
+				// console.log('DEBUG');
 			}
 		})
 	);
 
 	context.subscriptions.push(
 		vscode.workspace.onDidChangeTextDocument(e => {
-			console.log('DEBUG2');
+			// console.log('DEBUG2');
+			// console.log(e);
 		})
 	);
 
 
 	context.subscriptions.push(
 		vscode.window.onDidChangeTextEditorSelection(e => { // ここでカーソルの位置の変化もわかる
-			console.log('DEBUG3', e.selections[0].active);
+			// console.log('DEBUG3', e.selections[0].active.line);
+			// console.log(e.textEditor.document.lineAt(e.selections[0].active.line).text);
+			QuestionPanel.currentPanel?.setAnswer(
+				e.selections[0].active.line,
+				e.textEditor.document.lineAt(e.selections[0].active.line).text
+			);
 		})
 	);
 
@@ -51,13 +57,13 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showTextDocument(doc, {viewColumn: vscode.ViewColumn.One});
 		});
 
-		var lines = [
+		var questions = [
 			"import numpy as np",
 			"import toid",
 			"",
 			"p['a']"
 		];
-		QuestionPanel.createOrShow(context.extensionUri, lines);
+		QuestionPanel.createOrShow(context.extensionUri, questions);
 	});
 
 	context.subscriptions.push(disposable);
@@ -75,14 +81,14 @@ class QuestionPanel {
 	private readonly _extensionUri: vscode.Uri;
 	private _disposables: vscode.Disposable[] = [];
 
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, lines: string[]) {
+	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, questions: string[]) {
 		this._panel = panel;
 		this._extensionUri = extensionUri;
 
 		// Set the webview's initial html content
 		this._update();
-		for(let line of lines) {
-			this.addLine(line);
+		for(let question of questions) {
+			this.addQuestion(question);
 		}
 
 		// Listen for when the panel is disposed
@@ -106,7 +112,7 @@ class QuestionPanel {
 
 	}
 
-	public static createOrShow(extensionUri: vscode.Uri, lines: string[]) {
+	public static createOrShow(extensionUri: vscode.Uri, questions: string[]) {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
@@ -131,9 +137,7 @@ class QuestionPanel {
 			}
 		);
 
-		QuestionPanel.currentPanel = new QuestionPanel(panel, extensionUri, lines);
-
-		
+		QuestionPanel.currentPanel = new QuestionPanel(panel, extensionUri, questions);
 	}
 
 	public dispose() {
@@ -157,8 +161,12 @@ class QuestionPanel {
 		this._panel.webview.html = this._getHtmlForWebview(webview);
 	}
 
-	public addLine(line: string) {
-		this._panel.webview.postMessage({ command: 'addline', line: line });
+	public addQuestion(question: string) {
+		this._panel.webview.postMessage({ command: 'addQuestion', question: question });
+	}
+
+	public setAnswer(line: number, answer: string) {
+		this._panel.webview.postMessage({ command: 'setAnswer', line: line, answer: answer });
 	}
 
 
