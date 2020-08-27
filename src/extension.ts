@@ -56,10 +56,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// Open temporal python window
 		vscode.workspace.openTextDocument({language:"python", content:""}).then(doc => {
-			vscode.window.showTextDocument(doc, {viewColumn: vscode.ViewColumn.One});
+			vscode.window.showTextDocument(doc, {viewColumn: vscode.ViewColumn.One}).then(
+				e => {
+					QuestionPanel.createOrShow(context.extensionUri, questions);
+				}
+			);
 		});
-
-		QuestionPanel.createOrShow(context.extensionUri, questions);
 	});
 
 	context.subscriptions.push(disposable);
