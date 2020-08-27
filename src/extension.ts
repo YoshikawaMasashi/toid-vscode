@@ -58,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.workspace.openTextDocument({language:"python", content:""}).then(doc => {
 			vscode.window.showTextDocument(doc, {viewColumn: vscode.ViewColumn.One}).then(
 				e => {
-					QuestionPanel.createOrShow(context.extensionUri, questions);
+					QuestionPanel.createOrShow(context.extensionUri, args.path, questions);
 				}
 			);
 		});
@@ -79,12 +79,12 @@ class QuestionPanel {
 	private readonly _extensionUri: vscode.Uri;
 	private _disposables: vscode.Disposable[] = [];
 
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, questions: string[]) {
+	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, filename: string, questions: string[]) {
 		this._panel = panel;
 		this._extensionUri = extensionUri;
 
 		// Set the webview's initial html content
-		this._update();
+		this._update(filename);
 		for(let question of questions) {
 			this.addQuestion(question);
 		}
@@ -110,7 +110,7 @@ class QuestionPanel {
 
 	}
 
-	public static createOrShow(extensionUri: vscode.Uri, questions: string[]) {
+	public static createOrShow(extensionUri: vscode.Uri, filename: string, questions: string[]) {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
@@ -135,7 +135,7 @@ class QuestionPanel {
 			}
 		);
 
-		QuestionPanel.currentPanel = new QuestionPanel(panel, extensionUri, questions);
+		QuestionPanel.currentPanel = new QuestionPanel(panel, extensionUri, filename, questions);
 	}
 
 	public dispose() {
@@ -152,10 +152,10 @@ class QuestionPanel {
 		}
 	}
 
-	private _update() {
+	private _update(filename: string) {
 		const webview = this._panel.webview;
 
-		this._panel.title = "question";
+		this._panel.title = filename;
 		this._panel.webview.html = this._getHtmlForWebview(webview);
 	}
 
