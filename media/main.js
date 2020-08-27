@@ -104,39 +104,41 @@ function checkAnswer(question, answer) {
                 var answers = vscode.getState()['answers'];
                 var startTimes = vscode.getState()['startTimes'];
 
-                answers[message.line] = message.answer;
+                if (answers[message.line] !== message.answer) {
+                    answers[message.line] = message.answer;
 
-                var okIdx = checkAnswer(answers[message.line], questions[message.line]);
-                var correctFont = document.getElementById("correct" + message.line);
-                correctFont.textContent = answers[message.line].slice(0, okIdx).replace(/ /g, '␣');
-                var wrongFont = document.getElementById("wrong" + message.line);
-                wrongFont.textContent = answers[message.line].slice(okIdx, answers[message.line].length).replace(/ /g, '␣');
-                var yetFont = document.getElementById("yet" + message.line);
-                yetFont.textContent = questions[message.line].slice(okIdx, questions[message.line].length).replace(/ /g, '␣');
+                    var okIdx = checkAnswer(answers[message.line], questions[message.line]);
+                    var correctFont = document.getElementById("correct" + message.line);
+                    correctFont.textContent = answers[message.line].slice(0, okIdx).replace(/ /g, '␣');
+                    var wrongFont = document.getElementById("wrong" + message.line);
+                    wrongFont.textContent = answers[message.line].slice(okIdx, answers[message.line].length).replace(/ /g, '␣');
+                    var yetFont = document.getElementById("yet" + message.line);
+                    yetFont.textContent = questions[message.line].slice(okIdx, questions[message.line].length).replace(/ /g, '␣');
 
-                var resultSpan = document.getElementById("result" + message.line);
-                var timeSpan = document.getElementById("time" + message.line);
-                if (questions[message.line] !== "") {
-                    if (questions[message.line] === answers[message.line]) {
-                        resultSpan.textContent = " OK!";
-                    }
+                    var resultSpan = document.getElementById("result" + message.line);
+                    var timeSpan = document.getElementById("time" + message.line);
+                    if (questions[message.line] !== "") {
+                        if (questions[message.line] === answers[message.line]) {
+                            resultSpan.textContent = " OK!";
+                        } else {
+                            resultSpan.textContent = " ";
+                        }
 
-                    if (answers[message.line].length === 0) {
-                        startTimes[message.line] = null;
-                    } else if (answers[message.line].length === 1) {
-                        startTimes[message.line] = Date.now();
-                    }
+                        if (answers[message.line].length === 0) {
+                            startTimes[message.line] = null;
+                        } else if (answers[message.line].length === 1) {
+                            startTimes[message.line] = Date.now();
+                        }
 
-                    if(startTimes[message.line] === null) {
-                        timeSpan.textContent = "";
-                        resultSpan.textContent = "";
-                    } else {
-                        timeSpan.textContent = " " + (Date.now() - startTimes[message.line]) / 1000 + " sec";
+                        if(startTimes[message.line] === null) {
+                            timeSpan.textContent = "";
+                            resultSpan.textContent = "";
+                        } else {
+                            timeSpan.textContent = " " + (Date.now() - startTimes[message.line]) / 1000 + " sec";
+                        }
                     }
                 }
-
                 vscode.setState({ questions: questions, answers: answers, startTimes: startTimes});
-
         }
     });
 }());
