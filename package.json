@@ -4,6 +4,10 @@
 	"description": "toid extension",
 	"version": "0.0.1",
 	"publisher": "marshi",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/YoshikawaMasashi/toid-vscode.git"
+	},
 	"engines": {
 		"vscode": "^1.48.0"
 	},
