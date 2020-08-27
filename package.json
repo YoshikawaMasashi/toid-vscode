@@ -3,6 +3,7 @@
 	"displayName": "toid",
 	"description": "toid extension",
 	"version": "0.0.1",
+	"publisher": "marshi",
 	"engines": {
 		"vscode": "^1.48.0"
 	},
