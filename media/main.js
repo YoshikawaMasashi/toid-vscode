@@ -76,7 +76,7 @@ function checkAnswer(question, answer) {
                 var yetFont = document.createElement("font");
                 yetFont.setAttribute("id", "yet" + line);
                 yetFont.setAttribute("color", "#888888");
-                yetFont.textContent = message.question;
+                yetFont.textContent = message.question.replace(/ /g, '␣');
                 questionDiv.appendChild(yetFont);
 
                 if (message.question === "") {
@@ -108,11 +108,11 @@ function checkAnswer(question, answer) {
 
                 var okIdx = checkAnswer(answers[message.line], questions[message.line]);
                 var correctFont = document.getElementById("correct" + message.line);
-                correctFont.textContent = answers[message.line].slice(0, okIdx);
+                correctFont.textContent = answers[message.line].slice(0, okIdx).replace(/ /g, '␣');
                 var wrongFont = document.getElementById("wrong" + message.line);
-                wrongFont.textContent = answers[message.line].slice(okIdx, answers[message.line].length);
+                wrongFont.textContent = answers[message.line].slice(okIdx, answers[message.line].length).replace(/ /g, '␣');
                 var yetFont = document.getElementById("yet" + message.line);
-                yetFont.textContent = questions[message.line].slice(okIdx, questions[message.line].length);
+                yetFont.textContent = questions[message.line].slice(okIdx, questions[message.line].length).replace(/ /g, '␣');
 
                 var resultSpan = document.getElementById("result" + message.line);
                 var timeSpan = document.getElementById("time" + message.line);
