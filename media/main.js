@@ -80,9 +80,10 @@
 
                 answers[message.line] = message.answer;
 
+                var resultSpan = document.getElementById("result" + message.line);
+                var timeSpan = document.getElementById("time" + message.line);
                 if (questions[message.line] !== "") {
                     if (questions[message.line] === answers[message.line]) {
-                        var resultSpan = document.getElementById("result" + message.line);
                         resultSpan.textContent = " Done";
                     }
 
@@ -92,9 +93,9 @@
                         startTimes[message.line] = Date.now();
                     }
 
-                    var timeSpan = document.getElementById("time" + message.line);
                     if(startTimes[message.line] === null) {
                         timeSpan.textContent = "";
+                        resultSpan.textContent = "";
                     } else {
                         timeSpan.textContent = " " + (Date.now() - startTimes[message.line]);
                     }
