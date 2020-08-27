@@ -41,6 +41,7 @@
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
             case 'addQuestion':
+                console.log("addQuestion");
                 var questions = vscode.getState()['questions'];
                 var answers = vscode.getState()['answers'];
                 var startTimes = vscode.getState()['startTimes'];
