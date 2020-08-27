@@ -1,5 +1,16 @@
 // This script will be run within the webview itself
 
+function checkAnswer(question, answer) {
+    var okIdx = 0;
+    for (var i = 0; i < Math.min(question.length, answer.length); i++) {
+        if (question[i] !== answer[i]){
+        break;
+        }
+        okIdx += 1;
+    }
+    return okIdx;
+}
+
 // It cannot access the main VS Code APIs directly.
 (function () {
     const vscode = acquireVsCodeApi();
@@ -51,8 +62,23 @@
                 var questionDiv = document.createElement("div");
                 var line = questions.length;
                 questionDiv.setAttribute("id", "question" + line);
-                var questionContent = document.createTextNode(message.question); 
-                questionDiv.appendChild(questionContent);
+                
+                var correctFont = document.createElement("font");
+                correctFont.setAttribute("id", "correct" + line);
+                correctFont.setAttribute("color", "#222222");
+                questionDiv.appendChild(correctFont);
+
+                var wrongFont = document.createElement("font");
+                wrongFont.setAttribute("id", "wrong" + line);
+                wrongFont.setAttribute("color", "#ff2c34");
+                questionDiv.appendChild(wrongFont);
+
+                var yetFont = document.createElement("font");
+                yetFont.setAttribute("id", "yet" + line);
+                yetFont.setAttribute("color", "#888888");
+                yetFont.textContent = message.question;
+                questionDiv.appendChild(yetFont);
+
                 if (message.question === "") {
                     var br = document.createElement("br");
                     questionDiv.appendChild(br);
@@ -80,11 +106,19 @@
 
                 answers[message.line] = message.answer;
 
+                var okIdx = checkAnswer(answers[message.line], questions[message.line]);
+                var correctFont = document.getElementById("correct" + message.line);
+                correctFont.textContent = answers[message.line].slice(0, okIdx);
+                var wrongFont = document.getElementById("wrong" + message.line);
+                wrongFont.textContent = answers[message.line].slice(okIdx, answers[message.line].length);
+                var yetFont = document.getElementById("yet" + message.line);
+                yetFont.textContent = questions[message.line].slice(okIdx, questions[message.line].length);
+
                 var resultSpan = document.getElementById("result" + message.line);
                 var timeSpan = document.getElementById("time" + message.line);
                 if (questions[message.line] !== "") {
                     if (questions[message.line] === answers[message.line]) {
-                        resultSpan.textContent = " Done";
+                        resultSpan.textContent = " OK!";
                     }
 
                     if (answers[message.line].length === 0) {
@@ -97,7 +131,7 @@
                         timeSpan.textContent = "";
                         resultSpan.textContent = "";
                     } else {
-                        timeSpan.textContent = " " + (Date.now() - startTimes[message.line]);
+                        timeSpan.textContent = " " + (Date.now() - startTimes[message.line]) / 1000 + " sec";
                     }
                 }
 
